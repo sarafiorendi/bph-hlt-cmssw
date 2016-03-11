@@ -1,4 +1,4 @@
-from hlt_prova import *
+from hlt_bph import *
 
 process.source.fileNames          = cms.untracked.vstring([
     '/store/relval/CMSSW_8_0_0/RelValJpsiMuMu_Pt-15/GEN-SIM-RECO/80X_mcRun2_asymptotic_v4-v1/10000/CE6DB6EE-16DA-E511-91DF-0CC47A4D7650.root',
