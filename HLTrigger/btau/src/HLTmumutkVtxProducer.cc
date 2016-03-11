@@ -178,9 +178,9 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       for ( trkcand = trkcands->begin(); trkcand !=trkcands->end(); ++trkcand) {
         TrackRef trk3 = trkcand->get<TrackRef>();
 
-		//for internal test     
-		reco::RecoChargedCandidateRef cand1Ref(trkcands, itrk1cand);
-		itrk1cand ++;
+        //for internal test     
+        reco::RecoChargedCandidateRef cand1Ref(trkcands, itrk1cand);
+        itrk1cand ++;
         //end 
         
         if( overlap( trk1, trk3) ) continue;
@@ -194,16 +194,16 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
         if (fabs(trk3->eta()) > maxEta_)    continue;
         if (trk3->pt()        < minPt_ )    continue;
 
-		//for internal test: to delete
-		FreeTrajectoryState InitialFTS_Trk1 = initialFreeState(*trk3, magField);
-		TrajectoryStateClosestToBeamLine tscb_Trk1( blsBuilder(InitialFTS_Trk1, *recoBeamSpotHandle) );
-		double d0sigTrk1 = tscb_Trk1.transverseImpactParameter().significance();
-		if (d0sigTrk1 < minD0Significance_) continue;
-	  
+        //for internal test: to delete
+        FreeTrajectoryState InitialFTS_Trk1 = initialFreeState(*trk3, magField);
+        TrajectoryStateClosestToBeamLine tscb_Trk1( blsBuilder(InitialFTS_Trk1, *recoBeamSpotHandle) );
+        double d0sigTrk1 = tscb_Trk1.transverseImpactParameter().significance();
+        if (d0sigTrk1 < minD0Significance_) continue;
+      
         iPCollectionTrk1Pair.first  = cand1Ref  ;
         iPCollectionTrk1Pair.second = d0sigTrk1 ;
-		//end
-		
+        //end
+        
         // Combined system
         e1 = sqrt(trk1->momentum().Mag2() + MuMass2        );
         e2 = sqrt(trk2->momentum().Mag2() + MuMass2        );
@@ -242,36 +242,36 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
         double vtxProb = 0.0;
         if ((vertex.chi2()>=0.0) && (vertex.ndof()>0) ) vtxProb = TMath::Prob(vertex.chi2(), vertex.ndof() );
 
-		reco::Vertex::Point vpoint = vertex.position();
-		reco::Vertex::Error verr   = vertex.error();
-		GlobalPoint secondaryVertex (vpoint.x(), vpoint.y(), vpoint.z());
-		GlobalError err(verr.At(0,0), verr.At(1,0), verr.At(1,1), verr.At(2,0), verr.At(2,1), verr.At(2,2) );
-		GlobalPoint displacementFromBeamspot( -1*((vertexBeamSpot.x0() - secondaryVertex.x()) + (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dxdz()), 
-											  -1*((vertexBeamSpot.y0() - secondaryVertex.y()) + (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dydz()), 
-											   0 );
-		float lxy = displacementFromBeamspot.perp();
-		float lxyerr = sqrt(err.rerr(displacementFromBeamspot));
-		Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
-		math::XYZVector pperp(trk1->px() + trk2->px() + trk3->px(),
-							  trk1->py() + trk2->py() + trk3->py(),
-							  0.);
-		float cosAlpha = vperp.Dot(pperp)/(vperp.R()*pperp.R());
+        reco::Vertex::Point vpoint = vertex.position();
+        reco::Vertex::Error verr   = vertex.error();
+        GlobalPoint secondaryVertex (vpoint.x(), vpoint.y(), vpoint.z());
+        GlobalError err(verr.At(0,0), verr.At(1,0), verr.At(1,1), verr.At(2,0), verr.At(2,1), verr.At(2,2) );
+        GlobalPoint displacementFromBeamspot( -1*((vertexBeamSpot.x0() - secondaryVertex.x()) + (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dxdz()), 
+                                              -1*((vertexBeamSpot.y0() - secondaryVertex.y()) + (secondaryVertex.z() - vertexBeamSpot.z0()) * vertexBeamSpot.dydz()), 
+                                               0 );
+        float lxy = displacementFromBeamspot.perp();
+        float lxyerr = sqrt(err.rerr(displacementFromBeamspot));
+        Vertex::Point vperp(displacementFromBeamspot.x(),displacementFromBeamspot.y(),0.);
+        math::XYZVector pperp(trk1->px() + trk2->px() + trk3->px(),
+                              trk1->py() + trk2->py() + trk3->py(),
+                              0.);
+        float cosAlpha = vperp.Dot(pperp)/(vperp.R()*pperp.R());
 
-		LSigmaPair.first  = cand1Ref; 
-		LSigmaPair.second = lxy/lxyerr;
-		CosinePair.first  = cand1Ref;
-		CosinePair.second = cosAlpha;
-		VertexPair.first  = cand1Ref; 
-		VertexPair.second = vtxProb;
+        LSigmaPair.first  = cand1Ref; 
+        LSigmaPair.second = lxy/lxyerr;
+        CosinePair.first  = cand1Ref;
+        CosinePair.second = cosAlpha;
+        VertexPair.first  = cand1Ref; 
+        VertexPair.second = vtxProb;
         //end
         
         // put vertex in the event
         vertexCollection->push_back(vertex);
-		//for internal tests: to delete
-		LSigma             -> push_back(LSigmaPair            );
-		Cosine             -> push_back(CosinePair            );
-		VertexCL           -> push_back(VertexPair            );
-		iPCollectionTrk1   -> push_back(iPCollectionTrk1Pair  );
+        //for internal tests: to delete
+        LSigma             -> push_back(LSigmaPair            );
+        Cosine             -> push_back(CosinePair            );
+        VertexCL           -> push_back(VertexPair            );
+        iPCollectionTrk1   -> push_back(iPCollectionTrk1Pair  );
         //end
       }
     }
