@@ -28,10 +28,10 @@ process.theNtuples = cms.EDAnalyzer("BHltNtuples",
                        genParticlesTag          = cms.untracked.InputTag("genParticles"),
 
                        L3CandidatesTag          = cms.InputTag("hltL3MuonCandidates"), 
-                       TkCandidatesTag          = cms.InputTag("hltIter2DisplacedNRMuMuMerged"), 
+                       TkCandidatesTag          = cms.InputTag("hltJpsiTkAllConeTracksIter"), 
 
-                       MuMuVtxTag               = cms.untracked.InputTag("hltDisplacedmumuVtxProducerDoubleMu4LowMassNonResonant"),
-                       TkVtxTag                 = cms.untracked.InputTag("hltLowMassNonResonantTkAllConeTracksIter"),
+                       MuMuVtxTag               = cms.untracked.InputTag("hltDisplacedmumuVtxProducerDoubleMu4Jpsi"),
+                       TkVtxTag                 = cms.untracked.InputTag("hltJpsiTkVertexProducer"),
 
                        OfflineMuonsTag          = cms.untracked.InputTag("muons"),
                        OfflineTkTag             = cms.untracked.InputTag("generalTracks"),
