@@ -59,7 +59,7 @@ HLTmumutkVtxProducer::HLTmumutkVtxProducer(const edm::ParameterSet& iConfig):
 }
 
 // ----------------------------------------------------------------------
-HLTmumutkVtxProducer::~HLTmumutkVtxProducer() {}
+HLTmumutkVtxProducer::~HLTmumutkVtxProducer() = default;
 
 void
 HLTmumutkVtxProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
@@ -110,20 +110,20 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   Handle<RecoChargedCandidateCollection> trkcands;
   iEvent.getByToken(trkCandToken_,trkcands);
 
-  auto_ptr<VertexCollection> vertexCollection(new VertexCollection());
+  unique_ptr<VertexCollection> vertexCollection(new VertexCollection());
 
   //for internal tests: to delete
   RecoChargedCandidateDoublePair iPCollectionTrk1Pair;
   RecoChargedCandidateDoublePair           LSigmaPair;
   RecoChargedCandidateDoublePair           CosinePair;
   RecoChargedCandidateDoublePair           VertexPair;
-  auto_ptr<RecoChargedCandidateDoubleMap> iPCollectionTrk1( new RecoChargedCandidateDoubleMap);
-  auto_ptr<RecoChargedCandidateDoubleMap> LSigma          ( new RecoChargedCandidateDoubleMap);
-  auto_ptr<RecoChargedCandidateDoubleMap> Cosine          ( new RecoChargedCandidateDoubleMap);
-  auto_ptr<RecoChargedCandidateDoubleMap> VertexCL        ( new RecoChargedCandidateDoubleMap);
+  unique_ptr<RecoChargedCandidateDoubleMap> iPCollectionTrk1( new RecoChargedCandidateDoubleMap);
+  unique_ptr<RecoChargedCandidateDoubleMap> LSigma          ( new RecoChargedCandidateDoubleMap);
+  unique_ptr<RecoChargedCandidateDoubleMap> Cosine          ( new RecoChargedCandidateDoubleMap);
+  unique_ptr<RecoChargedCandidateDoubleMap> VertexCL        ( new RecoChargedCandidateDoubleMap);
   //end
-  
-  // Ref to Candidate object to be recorded in filter object
+
+
   RecoChargedCandidateRef refMu1;
   RecoChargedCandidateRef refMu2;
   RecoChargedCandidateRef refTrk;    
@@ -177,12 +177,11 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       //loop on track collection
       for ( trkcand = trkcands->begin(); trkcand !=trkcands->end(); ++trkcand) {
         TrackRef trk3 = trkcand->get<TrackRef>();
-
         //for internal test     
         reco::RecoChargedCandidateRef cand1Ref(trkcands, itrk1cand);
         itrk1cand ++;
         //end 
-        
+
         if( overlap( trk1, trk3) ) continue;
         if( overlap( trk2, trk3) ) continue;
             
@@ -198,12 +197,12 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
         FreeTrajectoryState InitialFTS_Trk1 = initialFreeState(*trk3, magField);
         TrajectoryStateClosestToBeamLine tscb_Trk1( blsBuilder(InitialFTS_Trk1, *recoBeamSpotHandle) );
         double d0sigTrk1 = tscb_Trk1.transverseImpactParameter().significance();
-        if (d0sigTrk1 < minD0Significance_) continue;
       
         iPCollectionTrk1Pair.first  = cand1Ref  ;
         iPCollectionTrk1Pair.second = d0sigTrk1 ;
+        if (d0sigTrk1 < minD0Significance_) continue;
         //end
-        
+
         // Combined system
         e1 = sqrt(trk1->momentum().Mag2() + MuMass2        );
         e2 = sqrt(trk2->momentum().Mag2() + MuMass2        );
@@ -264,7 +263,7 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
         VertexPair.first  = cand1Ref; 
         VertexPair.second = vtxProb;
         //end
-        
+
         // put vertex in the event
         vertexCollection->push_back(vertex);
         //for internal tests: to delete
@@ -276,12 +275,12 @@ void HLTmumutkVtxProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       }
     }
   }
-  iEvent.put(vertexCollection);
+  iEvent.put(std::move(vertexCollection));
   // for internal test
-  iEvent.put(iPCollectionTrk1, "d0firstTrk" ); 
-  iEvent.put(LSigma,           "LSigma"     );
-  iEvent.put(Cosine,           "Cosine"     );
-  iEvent.put(VertexCL,         "VertexCL"   );
+  iEvent.put(std::move(iPCollectionTrk1), "d0firstTrk" ); 
+  iEvent.put(std::move(LSigma),           "LSigma"     );
+  iEvent.put(std::move(Cosine),           "Cosine"     );
+  iEvent.put(std::move(VertexCL),         "VertexCL"   );
   //end
 }
 
@@ -303,8 +302,8 @@ bool HLTmumutkVtxProducer::overlap(const TrackRef& trackref1, const TrackRef& tr
 
 bool HLTmumutkVtxProducer::checkPreviousCand(const TrackRef& trackref, vector<RecoChargedCandidateRef> & refVect){
   bool ok=false;
-  for (unsigned int i=0; i<refVect.size(); i++) {
-    if ( refVect[i]->get<TrackRef>() == trackref ) {
+  for (auto & i : refVect) {
+    if ( i->get<TrackRef>() == trackref ) {
       ok=true;
       break;
     }
